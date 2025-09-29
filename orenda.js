@@ -24,8 +24,13 @@ window.botpress.init({
     "clientId": "0e1d8545-8363-4a31-943b-98333207676f"
 });
 
-window.botpress.updateUser({
-  data: {
-    brand : "Orenda"
-  },
-})
+window.botpress.on('webchat:initialized', () => {
+  console.log('Webchat has been initialized. Loading user...');
+  window.botpress.updateUser({
+    data: {
+      firstName: newFirstName,
+      lastName: newLastName,
+      email: newEmail,
+    },
+  })
+});
