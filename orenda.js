@@ -28,9 +28,7 @@ window.botpress.on('webchat:initialized', () => {
   console.log('Webchat has been initialized. Loading user...');
   window.botpress.updateUser({
     data: {
-      firstName: newFirstName,
-      lastName: newLastName,
-      email: newEmail,
+      brand:"Orenda"
     },
   })
 });
