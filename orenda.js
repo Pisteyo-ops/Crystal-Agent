@@ -21,10 +21,11 @@ window.botpress.init({
         "footer": "Orenda Live AI Expert Support!",
         "allowFileUpload": true
     },
-    "clientId": "0e1d8545-8363-4a31-943b-98333207676f",
-    "user": {
-        "data": {
-            "brand":"Orenda"
-        }
-    }
+    "clientId": "0e1d8545-8363-4a31-943b-98333207676f"
 });
+
+window.botpress.updateUser({
+  data: {
+    brand : "Orenda"
+  },
+})
