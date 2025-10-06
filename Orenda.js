@@ -4,7 +4,7 @@ window.botpress.init({
     "version": "v2",
     "botName": "Crystal",
     "botAvatar": "https://files.bpcontent.cloud/2025/06/17/22/20250617221227-WK5LAJ4V.png",
-    "botDescription": "How can I help you rule your pool today? Privacy Consent: By using this chat, you consent to the collection, recording, & use of this chat session & info you submit by Orenda & its service providers.",
+    "botDescription": "How can I help you rule your pool today? ",
     "fabImage": "https://files.bpcontent.cloud/2025/06/17/22/20250617221822-2M71EV3F.png",
     "website": {},
     "email": {},
@@ -16,14 +16,17 @@ window.botpress.init({
     "headerVariant": "glass",
     "themeMode": "light",
     "fontFamily": "inter",
-    "radius": 1,
+    "radius": 2.5,
     "feedbackEnabled": false,
-    "showPoweredBy": false,
-    "footer": "",
+    "footer": "Privacy Consent: By using this chat, you consent to the collection, recording, & use of this chat session & info you submit by Orenda",
     "additionalStylesheetUrl": "https://files.bpcontent.cloud/2025/01/31/21/20250131211512-O4XWWO1J.css",
-    "allowFileUpload": false,
+    "allowFileUpload": true,
     "storageLocation": "localStorage",
-    "soundEnabled": false
+    "soundEnabled": true,
+    "proactiveMessageEnabled": false,
+    "proactiveBubbleMessage": "Hi! ðŸ‘‹ Need help?",
+    "proactiveBubbleTriggerType": "afterDelay",
+    "proactiveBubbleDelayTime": 10
   },
   "clientId": "d08d44d1-1b76-4275-9069-8a8cb366b734"
 });
