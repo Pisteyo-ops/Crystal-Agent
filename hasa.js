@@ -1,27 +1,31 @@
 window.botpress.init({
-    "botId": "560191e9-30df-437a-8911-2f60d2da17a2",
-    "configuration": {
-        "version": "v1",
-        "botName": "Crystal",
-        "botAvatar": "https://files.bpcontent.cloud/2025/08/20/14/20250820140512-MF0UMJSB.png",
-        "botDescription": "By using HASA agent you agree to our privacy terms.",
-        "fabImage": "https://files.bpcontent.cloud/2025/08/20/14/20250820140512-MF0UMJSB.png",
-        "website": {},
-        "email": {},
-        "phone": {},
-        "termsOfService": {},
-        "privacyPolicy": {},
-        "color": "#3276EA",
-        "variant": "solid",
-        "headerVariant": "glass",
-        "themeMode": "light",
-        "fontFamily": "inter",
-        "radius": 3,
-        "feedbackEnabled": true,
-        "footer": "HASA Live AI Expert Support!",
-        "allowFileUpload": true
-    },
-    "clientId": "0e1d8545-8363-4a31-943b-98333207676f"
+  "botId": "59851f38-94fa-4719-8b70-f89a84bf6050",
+  "configuration": {
+    "version": "v2",
+    "botName": "Crystal",
+    "botAvatar": "https://files.bpcontent.cloud/2025/06/17/22/20250617221227-WK5LAJ4V.png",
+    "botDescription": "How can I help you rule your pool today? Privacy Consent: By using this chat, you consent to the collection, recording, & use of this chat session & info you submit by Orenda & its service providers.",
+    "fabImage": "https://files.bpcontent.cloud/2025/06/17/22/20250617221822-2M71EV3F.png",
+    "website": {},
+    "email": {},
+    "phone": {},
+    "termsOfService": {},
+    "privacyPolicy": {},
+    "color": "#26699b",
+    "variant": "soft",
+    "headerVariant": "glass",
+    "themeMode": "light",
+    "fontFamily": "inter",
+    "radius": 1,
+    "feedbackEnabled": false,
+    "showPoweredBy": false,
+    "footer": "",
+    "additionalStylesheetUrl": "https://files.bpcontent.cloud/2025/01/31/21/20250131211512-O4XWWO1J.css",
+    "allowFileUpload": false,
+    "storageLocation": "localStorage",
+    "soundEnabled": false
+  },
+  "clientId": "d08d44d1-1b76-4275-9069-8a8cb366b734"
 });
 
 window.botpress.on('webchat:initialized', () => {
