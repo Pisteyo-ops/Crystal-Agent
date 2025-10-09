@@ -3,9 +3,9 @@ window.botpress.init({
   "configuration": {
     "version": "v2",
     "botName": "Crystal",
-    "botAvatar": "https://files.bpcontent.cloud/2025/06/17/22/20250617221227-WK5LAJ4V.png",
+    "botAvatar": "https://files.bpcontent.cloud/2025/10/09/16/20251009162731-P1RP8COC.png",
     "botDescription": "How can I help you rule your pool today? ",
-    "fabImage": "https://files.bpcontent.cloud/2025/06/17/22/20250617221822-2M71EV3F.png",
+    "fabImage": "https://files.bpcontent.cloud/2025/10/09/16/20251009162810-VFG9XD80.png",
     "website": {},
     "email": {},
     "phone": {},
@@ -23,7 +23,7 @@ window.botpress.init({
     "allowFileUpload": true,
     "storageLocation": "localStorage",
     "soundEnabled": true,
-    "proactiveMessageEnabled": false,
+    "proactiveMessageEnabled": true,
     "proactiveBubbleMessage": "Hi! ðŸ‘‹ Need help?",
     "proactiveBubbleTriggerType": "afterDelay",
     "proactiveBubbleDelayTime": 10
