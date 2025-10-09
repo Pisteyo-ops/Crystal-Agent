@@ -18,7 +18,7 @@ window.botpress.init({
     "fontFamily": "inter",
     "radius": 2.5,
     "feedbackEnabled": false,
-    "footer": "Privacy Consent: By using this chat, you consent to the collection, recording, & use of this chat session & info you submit by Orenda/HASA",
+    "footer": "Privacy Consent: By using this chat, you consent to the collection, recording, & use of this chat session & info you submit by HASA",
     "additionalStylesheetUrl": "https://files.bpcontent.cloud/2025/01/31/21/20250131211512-O4XWWO1J.css",
     "allowFileUpload": true,
     "storageLocation": "localStorage",
