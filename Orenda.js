@@ -5,7 +5,7 @@ window.botpress.init({
     "botName": "Crystal",
     "botAvatar": "https://files.bpcontent.cloud/2025/06/17/22/20250617221227-WK5LAJ4V.png",
     "botDescription": "How can I help you rule your pool today? ",
-    "fabImage": "https://files.bpcontent.cloud/2025/06/17/22/20250617221227-WK5LAJ4V.png",
+    "fabImage": "https://files.bpcontent.cloud/2025/10/09/19/20251009190953-ZWVQMCW9.png",
     "website": {},
     "email": {},
     "phone": {},
