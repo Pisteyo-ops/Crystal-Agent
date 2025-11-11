@@ -3,7 +3,7 @@ window.botpress.init({
   "configuration": {
     "version": "v2",
     "botName": "Crystal",
-    "botAvatar": "https://files.bpcontent.cloud/2025/06/17/22/20250617221227-WK5LAJ4V.png",
+    "botAvatar": "https://files.bpcontent.cloud/2025/11/11/18/20251111180338-X9MO6TG3.png",
     "botDescription": "How can I help you rule your pool today? ",
     "fabImage": "https://files.bpcontent.cloud/2025/11/11/16/20251111164320-K3VSYICJ.png",
     "website": {},
