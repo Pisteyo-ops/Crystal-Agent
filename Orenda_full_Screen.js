@@ -18,7 +18,7 @@ window.botpress.init({
     "fontFamily": "inter",
     "radius": 2.5,
     "feedbackEnabled": false,
-    "footer": "Privacy Consent: By using this chat, you consent to the collection, recording, & use of this chat session & info you submit by Orenda",
+    "footer": "Privacy Consent: By using this chat, you consent to the collection, recording, & use of this chat session & info you submit by Crystal Pool",
     "allowFileUpload": true,
     "storageLocation": "localStorage",
     "soundEnabled": true,
