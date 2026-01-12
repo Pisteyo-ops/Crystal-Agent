@@ -39,4 +39,3 @@ window.botpress.on('webchat:initialized', () => {
     },
   })
 });
-
