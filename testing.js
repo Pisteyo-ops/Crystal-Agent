@@ -5,26 +5,27 @@
     const config = {
         botpressWebchatUrl: 'https://cdn.botpress.cloud/webchat/v3.5/inject.js',
         botpressConfigUrl: 'https://pisteyo-ops.github.io/Crystal-Agent/HASA.js',
-        botLogoUrl: 'animaged-crystal.png', // You can override this when initializing
+        botLogoUrl: 'animaged-crystal.png',
         botName: 'Crystal',
         popupMessage: 'Have a Question? I can help!',
-        popupDelay: 10000 // 10 seconds
+        popupDelay: 10000
     };
 
     // Inject CSS
     function injectStyles() {
         const styles = `
             * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-        }
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }
+
             .crystal-widget-button {
                 position: fixed;
                 bottom: 20px;
@@ -63,7 +64,7 @@
             .crystal-widget-button .crystal-close-icon {
                 position: absolute;
                 opacity: 0;
-                fill: #87CEEB;
+                fill: #FF0000;
                 width: 50px;
                 height: 50px;
             }
@@ -166,16 +167,21 @@
                 transform: scale(1);
             }
 
+            /* Desktop styles - consistent spacing from top */
             @media (min-width: 769px) {
                 .crystal-chat-container {
                     bottom: 100px;
                     right: 20px;
                     width: 25vw;
-                    height: 85vh;
                     min-width: 350px;
+                    max-width: 450px;
+                    /* Dynamic height: from 100px from bottom to 20px from top */
+                    height: calc(100vh - 120px);
+                    top: 20px;
                 }
             }
 
+            /* Mobile styles - fullscreen with safe areas */
             @media (max-width: 768px) {
                 .crystal-widget-button {
                     bottom: 15px;
@@ -195,13 +201,26 @@
                 }
 
                 .crystal-chat-container {
-                    bottom: 80px;
-                    right: 10px;
-                    left: 10px;
-                    width: calc(100vw - 10px);
-                    height: calc(100vh - 20vh);
-                    border-radius: 12px;
+                    /* Full viewport width minus small margins */
+                    left: 0.5vw;
+                    right: 0.5vw;
+                    width: 99vw;
+                    
+                    /* Full height accounting for safe areas and browser chrome */
+                    top: env(safe-area-inset-top, 0);
+                    bottom: 0;
+                    height: calc(100vh - env(safe-area-inset-top, 0));
+                    height: calc(100dvh - env(safe-area-inset-top, 0)); /* dvh for mobile browsers */
+                    
+                    border-radius: 0;
                     margin: 0;
+                }
+
+                /* iOS Safari specific - accounts for address bar */
+                @supports (-webkit-touch-callout: none) {
+                    .crystal-chat-container {
+                        height: -webkit-fill-available;
+                    }
                 }
 
                 .crystal-popup-notification {
@@ -230,6 +249,7 @@
                 overflow-y: auto;
                 overflow-x: hidden;
                 position: relative;
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
             }
 
             .crystal-chat-content:hover {
@@ -249,6 +269,13 @@
             @media (min-width: 769px) {
                 body.crystal-chat-active {
                     overflow: auto;
+                }
+            }
+
+            /* Prevent zoom on iOS */
+            @media (max-width: 768px) {
+                .crystal-chat-container * {
+                    touch-action: manipulation;
                 }
             }
         `;
@@ -293,18 +320,15 @@
     }
 
     // Load Botpress scripts
-    // Load Botpress scripts (guaranteed order)
     function loadBotpressScripts() {
         return new Promise((resolve, reject) => {
-            // 1) Load webchat inject script FIRST
             const webchatScript = document.createElement('script');
             webchatScript.src = config.botpressWebchatUrl;
-            webchatScript.async = false; // important: preserve execution order
+            webchatScript.async = false;
             webchatScript.onload = () => {
-                // 2) Then load your bot configuration script
                 const configScript = document.createElement('script');
                 configScript.src = config.botpressConfigUrl;
-                configScript.async = false; // important
+                configScript.async = false;
                 configScript.onload = resolve;
                 configScript.onerror = reject;
                 document.head.appendChild(configScript);
@@ -314,6 +338,16 @@
         });
     }
 
+    // Handle mobile viewport changes (address bar showing/hiding)
+    function handleViewportResize() {
+        if (window.innerWidth <= 768) {
+            const chatContainer = document.getElementById('crystalChatContainer');
+            if (chatContainer && chatContainer.classList.contains('active')) {
+                // Force recalculation of height when viewport changes
+                chatContainer.style.height = window.innerHeight + 'px';
+            }
+        }
+    }
 
     // Initialize widget functionality
     function initializeWidget() {
@@ -322,6 +356,10 @@
         const chatContent = document.getElementById('crystalChatContent');
         const popupNotification = document.getElementById('crystalPopupNotification');
         const popupClose = document.getElementById('crystalPopupClose');
+
+        // Handle viewport resize for mobile
+        window.addEventListener('resize', handleViewportResize);
+        window.addEventListener('orientationchange', handleViewportResize);
 
         // Show popup after configured delay
         let popupTimer = setTimeout(() => {
@@ -346,6 +384,7 @@
 
             if (window.innerWidth <= 768) {
                 document.body.classList.add('crystal-chat-active');
+                handleViewportResize();
             }
         });
 
@@ -365,6 +404,7 @@
 
                 if (window.innerWidth <= 768) {
                     document.body.classList.add('crystal-chat-active');
+                    handleViewportResize();
                 }
             }
         });
@@ -403,7 +443,6 @@
     // Public API
     window.CrystalBot = {
         init: function (options = {}) {
-            // Override default config with user options
             if (options.botLogoUrl) config.botLogoUrl = options.botLogoUrl;
             if (options.botName) config.botName = options.botName;
             if (options.popupMessage) config.popupMessage = options.popupMessage;
@@ -411,12 +450,10 @@
             if (options.botpressWebchatUrl) config.botpressWebchatUrl = options.botpressWebchatUrl;
             if (options.botpressConfigUrl) config.botpressConfigUrl = options.botpressConfigUrl;
 
-            // Initialize the widget
             injectStyles();
             injectHTML();
             loadBotpressScripts();
 
-            // Wait for DOM to be ready before initializing widget
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initializeWidget);
             } else {
