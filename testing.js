@@ -282,6 +282,35 @@
                     touch-action: manipulation;
                 }
             }
+
+            /* Mobile: hide floating close icon */
+@media (max-width: 768px) {
+    .crystal-widget-button.active {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .bp-mobile-close {
+        position: absolute;
+        top: 48px; /* just below sound & restart */
+        right: 12px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        border-radius: 999px; /* cylindrical */
+        background: #f1f3f5;
+        color: #333;
+        border: 1px solid #ddd;
+        cursor: pointer;
+        z-index: 10;
+        transition: background 0.2s ease;
+    }
+
+    .bp-mobile-close:hover {
+        background: #e9ecef;
+    }
+}
         `;
 
         const styleSheet = document.createElement('style');
@@ -389,6 +418,7 @@
             if (window.innerWidth <= 768) {
                 document.body.classList.add('crystal-chat-active');
                 handleViewportResize();
+                injectMobileHeaderClose();
             }
         });
 
@@ -409,6 +439,7 @@
                 if (window.innerWidth <= 768) {
                     document.body.classList.add('crystal-chat-active');
                     handleViewportResize();
+                    injectMobileHeaderClose();
                 }
             }
         });
@@ -443,6 +474,37 @@
         //     }
         // });
     }
+
+    function injectMobileHeaderClose() {
+    if (window.innerWidth > 768) return;
+
+    const interval = setInterval(() => {
+        const header = document.querySelector(
+            '.bpw-header, .bpw-header-container'
+        );
+
+        if (!header || header.querySelector('.bp-mobile-close')) return;
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'bp-mobile-close';
+        closeBtn.textContent = 'Close';
+
+        closeBtn.addEventListener('click', () => {
+            const chatContainer = document.getElementById('crystalChatContainer');
+            const widgetButton = document.getElementById('crystalWidgetButton');
+
+            chatContainer.classList.remove('active');
+            widgetButton.classList.remove('active');
+            document.body.classList.remove('crystal-chat-active');
+        });
+
+        header.style.position = 'relative';
+        header.appendChild(closeBtn);
+
+        clearInterval(interval);
+    }, 300);
+}
+
 
     // Public API
     window.CrystalBot = {
