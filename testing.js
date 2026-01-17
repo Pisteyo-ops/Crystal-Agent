@@ -256,10 +256,10 @@
             .crystal-mobile-close-btn {
                 display: none;
                 position: absolute;
-                top: 5%;
+                top: 8%;
                 right: 4%;
                 padding: 8px 16px;
-                background: white;
+                background: #fdfdfd;
                 border: 1px solid rgba(0, 0, 0, 0.1);
                 border-radius: 20px;
                 cursor: pointer;
