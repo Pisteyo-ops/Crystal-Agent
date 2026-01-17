@@ -478,7 +478,7 @@
                     // Show close button after 4 seconds
                     setTimeout(() => {
                         mobileCloseBtn.classList.add('show');
-                    }, 4000);
+                    }, 500);
                 }
             }
         });
