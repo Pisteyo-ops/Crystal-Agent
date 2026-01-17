@@ -3,7 +3,7 @@
 
     // Configuration
     const config = {
-        botpressWebchatUrl: 'https://cdn.botpress.cloud/webchat/v3.5/inject.js',
+        botpressWebchatUrl: 'https://pisteyo-ops.github.io/Crystal-Agent/inject_full_screen.js',
         botpressConfigUrl: 'https://pisteyo-ops.github.io/Crystal-Agent/HASA.js',
         botLogoUrl: 'animaged-crystal.png',
         botName: 'Crystal',
