@@ -257,26 +257,24 @@
                 display: none;
                 position: absolute;
                 top: 0.3%;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 8px 16px;
-                background: #fdfdfd;
-                border: 1px solid rgba(0, 0, 0, 0.1);
-                border-radius: 20px;
+                right: 6%;
+                padding: 4px 8px;
+                background: transparent;
+                border: none;
                 cursor: pointer;
                 z-index: 2147483647;
                 align-items: center;
                 justify-content: center;
-                font-size: 14px;
+                font-size: 15px;
                 font-family: Arial, sans-serif;
-                color: #333;
-                font-weight: 500;
+                color: #5e6576;
+                font-weight: 400;
+                text-decoration: underline;
                 transition: all 0.2s ease;
             }
 
             .crystal-mobile-close-btn:active {
-                transform: scale(0.95);
-                background: rgba(240, 240, 240, 1);
+                color: #0056b3;
             }
 
             @media (max-width: 768px) {
@@ -445,10 +443,10 @@
                 widgetButton.style.display = 'none';
                 handleViewportResize();
                 
-                // Show close button after 4 seconds
+                // Show close button after 0.5 seconds
                 setTimeout(() => {
                     mobileCloseBtn.classList.add('show');
-                }, 2000);
+                }, 500);
             }
         });
 
