@@ -195,9 +195,13 @@
                     height: 50px;
                 }
 
+                /* Hide close icon on mobile - use dedicated close button instead */
                 .crystal-widget-button .crystal-close-icon {
-                    width: 30px;
-                    height: 30px;
+                    display: none;
+                }
+
+                .crystal-widget-button.active .crystal-chat-gif {
+                    opacity: 1;
                 }
 
                 .crystal-chat-container {
@@ -245,6 +249,38 @@
 
                 .crystal-popup-content p {
                     font-size: 13px;
+                }
+            }
+
+            /* Mobile close button */
+            .crystal-mobile-close-btn {
+                display: none;
+                position: absolute;
+                top: 5%;
+                right: 4%;
+                padding: 8px 16px;
+                background: white;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                border-radius: 20px;
+                cursor: pointer;
+                z-index: 2147483647;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                font-family: Arial, sans-serif;
+                color: #333;
+                font-weight: 500;
+                transition: all 0.2s ease;
+            }
+
+            .crystal-mobile-close-btn:active {
+                transform: scale(0.95);
+                background: rgba(240, 240, 240, 1);
+            }
+
+            @media (max-width: 768px) {
+                .crystal-chat-container.active .crystal-mobile-close-btn.show {
+                    display: flex;
                 }
             }
 
@@ -312,6 +348,9 @@
 
             <!-- Chat Container -->
             <div class="crystal-chat-container" id="crystalChatContainer">
+                <button class="crystal-mobile-close-btn" id="crystalMobileCloseBtn" aria-label="Close chat">
+                    Close
+                </button>
                 <div class="crystal-chat-content" id="crystalChatContent">
                     <div id="testing"></div>
                 </div>
@@ -360,10 +399,24 @@
         const chatContent = document.getElementById('crystalChatContent');
         const popupNotification = document.getElementById('crystalPopupNotification');
         const popupClose = document.getElementById('crystalPopupClose');
+        const mobileCloseBtn = document.getElementById('crystalMobileCloseBtn');
 
         // Handle viewport resize for mobile
         window.addEventListener('resize', handleViewportResize);
         window.addEventListener('orientationchange', handleViewportResize);
+
+        // Mobile close button handler
+        mobileCloseBtn.addEventListener('click', () => {
+            chatContainer.classList.remove('active');
+            widgetButton.classList.remove('active');
+            document.body.classList.remove('crystal-chat-active');
+            
+            // Show widget button on mobile and hide close button
+            if (window.innerWidth <= 768) {
+                widgetButton.style.display = 'flex';
+                mobileCloseBtn.classList.remove('show');
+            }
+        });
 
         // Show popup after configured delay
         let popupTimer = setTimeout(() => {
@@ -388,7 +441,13 @@
 
             if (window.innerWidth <= 768) {
                 document.body.classList.add('crystal-chat-active');
+                widgetButton.style.display = 'none';
                 handleViewportResize();
+                
+                // Show close button after 4 seconds
+                setTimeout(() => {
+                    mobileCloseBtn.classList.add('show');
+                }, 2000);
             }
         });
 
@@ -400,6 +459,12 @@
                 chatContainer.classList.remove('active');
                 widgetButton.classList.remove('active');
                 document.body.classList.remove('crystal-chat-active');
+                
+                // Show widget button on mobile and hide close button
+                if (window.innerWidth <= 768) {
+                    widgetButton.style.display = 'flex';
+                    mobileCloseBtn.classList.remove('show');
+                }
             } else {
                 popupNotification.classList.remove('show');
                 popupNotification.classList.add('hide');
@@ -408,7 +473,13 @@
 
                 if (window.innerWidth <= 768) {
                     document.body.classList.add('crystal-chat-active');
+                    widgetButton.style.display = 'none';
                     handleViewportResize();
+                    
+                    // Show close button after 4 seconds
+                    setTimeout(() => {
+                        mobileCloseBtn.classList.add('show');
+                    }, 4000);
                 }
             }
         });
