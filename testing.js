@@ -180,41 +180,6 @@
                     top: 20px;
                 }
             }
-            /* Mobile close button - hidden by default */
-.mobile-close-btn {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .mobile-close-btn {
-        display: block;
-        width: 100%;
-        text-align: center;
-        padding: 8px 0;
-        margin-top: 8px;
-    }
-
-    .mobile-close-btn button {
-        background: #f0f0f0;
-        border: none;
-        border-radius: 20px;
-        padding: 6px 20px;
-        font-size: 13px;
-        color: #666;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .mobile-close-btn button:hover {
-        background: #e0e0e0;
-        color: #333;
-    }
-
-    .mobile-close-btn button:active {
-        transform: scale(0.95);
-    }
-}
 
             /* Mobile styles - fullscreen with safe areas */
             @media (max-width: 768px) {
@@ -395,16 +360,6 @@
         const chatContent = document.getElementById('crystalChatContent');
         const popupNotification = document.getElementById('crystalPopupNotification');
         const popupClose = document.getElementById('crystalPopupClose');
-
-        // Mobile close button handler
-const mobileCloseBtn = document.getElementById('mobileCloseBtn');
-if (mobileCloseBtn) {
-    mobileCloseBtn.addEventListener('click', () => {
-        chatContainer.classList.remove('active');
-        widgetButton.classList.remove('active');
-        document.body.classList.remove('crystal-chat-active');
-    });
-}
 
         // Handle viewport resize for mobile
         window.addEventListener('resize', handleViewportResize);
