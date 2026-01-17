@@ -290,12 +290,15 @@
     }
 }
 
+/* Mobile-only: Close button inside Botpress header actions */
 @media (max-width: 768px) {
     .bp-mobile-close {
-        position: absolute;
-        top: 48px; /* just below sound & restart */
-        right: 12px;
-        padding: 6px 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        padding: 0 12px;
+        margin-left: 8px;
         font-size: 12px;
         font-weight: 500;
         border-radius: 999px; /* cylindrical */
@@ -303,14 +306,15 @@
         color: #333;
         border: 1px solid #ddd;
         cursor: pointer;
-        z-index: 10;
-        transition: background 0.2s ease;
+        line-height: 1;
+        white-space: nowrap;
     }
 
-    .bp-mobile-close:hover {
+    .bp-mobile-close:active {
         background: #e9ecef;
     }
 }
+
         `;
 
         const styleSheet = document.createElement('style');
@@ -479,13 +483,17 @@ function injectMobileHeaderClose() {
     if (window.innerWidth > 768) return;
 
     const interval = setInterval(() => {
-        const header = document.querySelector('.bpHeaderContainer');
+        const actionsContainer = document.querySelector(
+            '.bpHeaderContentActionsContainer'
+        );
 
-        if (!header || header.querySelector('.bp-mobile-close')) return;
+        if (!actionsContainer || actionsContainer.querySelector('.bp-mobile-close')) {
+            return;
+        }
 
         const closeBtn = document.createElement('button');
-        closeBtn.className = 'bp-mobile-close';
         closeBtn.type = 'button';
+        closeBtn.className = 'bp-mobile-close';
         closeBtn.textContent = 'Close';
 
         closeBtn.addEventListener('click', () => {
@@ -497,14 +505,11 @@ function injectMobileHeaderClose() {
             document.body.classList.remove('crystal-chat-active');
         });
 
-        /* Ensure header can position children */
-        header.style.position = 'relative';
-        header.style.overflow = 'visible';
-
-        header.appendChild(closeBtn);
+        actionsContainer.appendChild(closeBtn);
         clearInterval(interval);
     }, 300);
 }
+
 
 
     // Public API
