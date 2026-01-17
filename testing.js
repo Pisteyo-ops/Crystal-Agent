@@ -223,6 +223,10 @@
                     }
                 }
 
+                .crystal-chat-container {
+                    overscroll-behavior: contain;
+                }
+
                 .crystal-popup-notification {
                     bottom: 75px;
                     right: 10px;
@@ -419,25 +423,25 @@
         }, { passive: true });
 
         // Store scroll position and prevent scrolling
-        let scrollPosition = 0;
+        // let scrollPosition = 0;
 
-        chatContent.addEventListener('mouseenter', () => {
-            scrollPosition = window.pageYOffset;
-            document.body.style.position = 'fixed';
-            document.body.style.top = `-${scrollPosition}px`;
-            document.body.style.width = '100%';
-            document.body.style.overflowY = 'scroll';
-        });
+        // chatContent.addEventListener('mouseenter', () => {
+        //     scrollPosition = window.pageYOffset;
+        //     document.body.style.position = 'fixed';
+        //     document.body.style.top = `-${scrollPosition}px`;
+        //     document.body.style.width = '100%';
+        //     document.body.style.overflowY = 'scroll';
+        // });
 
-        chatContent.addEventListener('mouseleave', () => {
-            if (window.innerWidth > 768) {
-                document.body.style.position = '';
-                document.body.style.top = '';
-                document.body.style.width = '';
-                document.body.style.overflowY = '';
-                window.scrollTo(0, scrollPosition);
-            }
-        });
+        // chatContent.addEventListener('mouseleave', () => {
+        //     if (window.innerWidth > 768) {
+        //         document.body.style.position = '';
+        //         document.body.style.top = '';
+        //         document.body.style.width = '';
+        //         document.body.style.overflowY = '';
+        //         window.scrollTo(0, scrollPosition);
+        //     }
+        // });
     }
 
     // Public API
