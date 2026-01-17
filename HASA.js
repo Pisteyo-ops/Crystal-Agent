@@ -22,11 +22,7 @@ window.botpress.init({
     "allowFileUpload": true,
     "storageLocation": "localStorage",
     "soundEnabled": true,
-    "embeddedChatId": "testing",
-    "proactiveMessageEnabled": true,
-    "proactiveBubbleMessage": "Have a question? I can help!",
-    "proactiveBubbleTriggerType": "afterDelay",
-    "proactiveBubbleDelayTime": 10
+    "embeddedChatId": "testing"
   },
   "clientId": "d08d44d1-1b76-4275-9069-8a8cb366b734"
 });
