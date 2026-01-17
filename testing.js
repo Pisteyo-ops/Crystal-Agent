@@ -40,7 +40,7 @@
                 cursor: pointer;
                 box-shadow: none;
                 transition: transform 0.3s ease;
-                z-index: 1001;
+                z-index: 2147483646;
                 border: none;
             }
 
@@ -89,7 +89,7 @@
                 align-items: flex-start;
                 gap: 12px;
                 max-width: 320px;
-                z-index: 1002;
+                z-index: 2147483645;
                 opacity: 0;
                 visibility: hidden;
                 transform: translateY(10px);
@@ -152,7 +152,7 @@
                 box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
                 border-radius: 12px;
                 overflow: hidden;
-                z-index: 1000;
+                z-index: 2147483644;
                 transition: all 0.3s ease;
                 opacity: 0;
                 visibility: hidden;
