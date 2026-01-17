@@ -256,8 +256,9 @@
             .crystal-mobile-close-btn {
                 display: none;
                 position: absolute;
-                top: 8%;
-                right: 4%;
+                top: 0.3%;
+                left: 50%;
+                transform: translateX(-50%);
                 padding: 8px 16px;
                 background: #fdfdfd;
                 border: 1px solid rgba(0, 0, 0, 0.1);
