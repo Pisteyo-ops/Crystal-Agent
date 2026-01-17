@@ -282,39 +282,6 @@
                     touch-action: manipulation;
                 }
             }
-
-            /* Mobile: hide floating close icon */
-@media (max-width: 768px) {
-    .crystal-widget-button.active {
-        display: none;
-    }
-}
-
-/* Mobile-only: Close button inside Botpress header actions */
-@media (max-width: 768px) {
-    .bp-mobile-close {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 28px;
-        padding: 0 12px;
-        margin-left: 8px;
-        font-size: 12px;
-        font-weight: 500;
-        border-radius: 999px; /* cylindrical */
-        background: #f1f3f5;
-        color: #333;
-        border: 1px solid #ddd;
-        cursor: pointer;
-        line-height: 1;
-        white-space: nowrap;
-    }
-
-    .bp-mobile-close:active {
-        background: #e9ecef;
-    }
-}
-
         `;
 
         const styleSheet = document.createElement('style');
@@ -422,7 +389,6 @@
             if (window.innerWidth <= 768) {
                 document.body.classList.add('crystal-chat-active');
                 handleViewportResize();
-                injectMobileHeaderClose();
             }
         });
 
@@ -443,7 +409,6 @@
                 if (window.innerWidth <= 768) {
                     document.body.classList.add('crystal-chat-active');
                     handleViewportResize();
-                    injectMobileHeaderClose();
                 }
             }
         });
@@ -478,39 +443,6 @@
         //     }
         // });
     }
-
-function injectMobileHeaderClose() {
-    if (window.innerWidth > 768) return;
-
-    const interval = setInterval(() => {
-        const actionsContainer = document.querySelector(
-            '.bpHeaderContentActionsContainer'
-        );
-
-        if (!actionsContainer || actionsContainer.querySelector('.bp-mobile-close')) {
-            return;
-        }
-
-        const closeBtn = document.createElement('button');
-        closeBtn.type = 'button';
-        closeBtn.className = 'bp-mobile-close';
-        closeBtn.textContent = 'Close';
-
-        closeBtn.addEventListener('click', () => {
-            const chatContainer = document.getElementById('crystalChatContainer');
-            const widgetButton = document.getElementById('crystalWidgetButton');
-
-            chatContainer.classList.remove('active');
-            widgetButton.classList.remove('active');
-            document.body.classList.remove('crystal-chat-active');
-        });
-
-        actionsContainer.appendChild(closeBtn);
-        clearInterval(interval);
-    }, 300);
-}
-
-
 
     // Public API
     window.CrystalBot = {
