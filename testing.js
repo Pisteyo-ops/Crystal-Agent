@@ -475,18 +475,17 @@
         // });
     }
 
-    function injectMobileHeaderClose() {
+function injectMobileHeaderClose() {
     if (window.innerWidth > 768) return;
 
     const interval = setInterval(() => {
-        const header = document.querySelector(
-            '.bpw-header, .bpw-header-container'
-        );
+        const header = document.querySelector('.bpHeaderContainer');
 
         if (!header || header.querySelector('.bp-mobile-close')) return;
 
         const closeBtn = document.createElement('button');
         closeBtn.className = 'bp-mobile-close';
+        closeBtn.type = 'button';
         closeBtn.textContent = 'Close';
 
         closeBtn.addEventListener('click', () => {
@@ -498,9 +497,11 @@
             document.body.classList.remove('crystal-chat-active');
         });
 
+        /* Ensure header can position children */
         header.style.position = 'relative';
-        header.appendChild(closeBtn);
+        header.style.overflow = 'visible';
 
+        header.appendChild(closeBtn);
         clearInterval(interval);
     }, 300);
 }
