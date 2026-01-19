@@ -289,6 +289,12 @@
                 overflow-x: hidden;
                 position: relative;
                 -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE and Edge */
+            }
+
+            .crystal-chat-content::-webkit-scrollbar {
+                display: none; /* Chrome, Safari, Opera */
             }
 
             .crystal-chat-content:hover {
@@ -478,7 +484,7 @@
                     // Show close button after 4 seconds
                     setTimeout(() => {
                         mobileCloseBtn.classList.add('show');
-                    }, 500);
+                    }, 4000);
                 }
             }
         });
