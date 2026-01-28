@@ -1,11 +1,11 @@
 window.botpress.init({
-  "botId": "560191e9-30df-437a-8911-2f60d2da17a2",
+  "botId": "59851f38-94fa-4719-8b70-f89a84bf6050",
   "configuration": {
     "version": "v2",
     "botName": "Crystal",
-    "botAvatar": "https://files.bpcontent.cloud/2025/06/17/22/20250617221227-WK5LAJ4V.png",
+    "botAvatar": "https://files.bpcontent.cloud/2025/11/11/18/20251111180338-X9MO6TG3.png",
     "botDescription": "How can I help you rule your pool today? ",
-    "fabImage": "https://files.bpcontent.cloud/2025/06/17/22/20250617221822-2M71EV3F.png",
+    "fabImage": "https://files.bpcontent.cloud/2025/11/11/16/20251111164320-K3VSYICJ.png",
     "website": {},
     "email": {},
     "phone": {},
@@ -18,24 +18,20 @@ window.botpress.init({
     "fontFamily": "inter",
     "radius": 2.5,
     "feedbackEnabled": false,
-    "footer": "Privacy Consent: By using this chat, you consent to the collection, recording, & use of this chat session & info you submit by Orenda",
-    "additionalStylesheetUrl": "https://files.bpcontent.cloud/2025/01/31/21/20250131211512-O4XWWO1J.css",
+    "footer": "Privacy Consent: By using this chat, you consent to the collection, recording, & use of this chat session & info you submit by HASA",
     "allowFileUpload": true,
     "storageLocation": "localStorage",
     "soundEnabled": true,
-    "proactiveMessageEnabled": false,
-    "proactiveBubbleMessage": "Hi! ðŸ‘‹ Need help?",
-    "proactiveBubbleTriggerType": "afterDelay",
-    "proactiveBubbleDelayTime": 10
+    "embeddedChatId": "testing"
   },
-  "clientId": "0e1d8545-8363-4a31-943b-98333207676f"
+  "clientId": "d08d44d1-1b76-4275-9069-8a8cb366b734"
 });
 
 window.botpress.on('webchat:initialized', () => {
   console.log('Webchat has been initialized. Loading user...');
   window.botpress.updateUser({
     data: {
-      brand:"Orenda"
+      brand:"Orenda-Demo"
     },
   })
 });
