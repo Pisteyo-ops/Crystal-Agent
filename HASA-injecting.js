@@ -521,29 +521,67 @@
     }
 
     // Public API
-    window.CrystalBot = {
-        init: function (options = {}) {
-            if (options.botLogoUrl) config.botLogoUrl = options.botLogoUrl;
-            if (options.botName) config.botName = options.botName;
-            if (options.popupMessage) config.popupMessage = options.popupMessage;
-            if (options.popupDelay !== undefined) config.popupDelay = options.popupDelay;
-            if (options.botpressWebchatUrl) config.botpressWebchatUrl = options.botpressWebchatUrl;
-            if (options.botpressConfigUrl) config.botpressConfigUrl = options.botpressConfigUrl;
+// Public API
+window.CrystalBot = {
+    init: function (options = {}) {
+        if (options.botLogoUrl) config.botLogoUrl = options.botLogoUrl;
+        if (options.botName) config.botName = options.botName;
+        if (options.popupMessage) config.popupMessage = options.popupMessage;
+        if (options.popupDelay !== undefined) config.popupDelay = options.popupDelay;
+        if (options.botpressWebchatUrl) config.botpressWebchatUrl = options.botpressWebchatUrl;
+        if (options.botpressConfigUrl) config.botpressConfigUrl = options.botpressConfigUrl;
 
-            injectStyles();
-            injectHTML();
-            loadBotpressScripts();
+        injectStyles();
+        injectHTML();
+        loadBotpressScripts();
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializeWidget);
-            } else {
-                initializeWidget();
-            }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWidget);
+        } else {
+            initializeWidget();
         }
-    };
+    },
+
+    open: function () {
+        const widgetButton = document.getElementById('crystalWidgetButton');
+        const chatContainer = document.getElementById('crystalChatContainer');
+        const mobileCloseBtn = document.getElementById('crystalMobileCloseBtn');
+
+        if (!chatContainer || chatContainer.classList.contains('active')) return;
+
+        chatContainer.classList.add('active');
+        widgetButton.classList.add('active');
+
+        if (window.innerWidth <= 768) {
+            document.body.classList.add('crystal-chat-active');
+            widgetButton.style.display = 'none';
+
+            setTimeout(() => {
+                mobileCloseBtn?.classList.add('show');
+            }, 500);
+        }
+    },
+
+    close: function () {
+        const widgetButton = document.getElementById('crystalWidgetButton');
+        const chatContainer = document.getElementById('crystalChatContainer');
+        const mobileCloseBtn = document.getElementById('crystalMobileCloseBtn');
+
+        chatContainer?.classList.remove('active');
+        widgetButton?.classList.remove('active');
+        document.body.classList.remove('crystal-chat-active');
+
+        if (window.innerWidth <= 768 && widgetButton) {
+            widgetButton.style.display = 'flex';
+            mobileCloseBtn?.classList.remove('show');
+        }
+    }
+};
+
 
     // Auto-initialize if data attribute is present
     if (document.currentScript && document.currentScript.hasAttribute('data-auto-init')) {
         window.CrystalBot.init();
     }
 })();
+
