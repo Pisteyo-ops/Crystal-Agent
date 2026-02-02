@@ -3,8 +3,8 @@
 
     // Configuration
     const config = {
-        botpressWebchatUrl: 'https://pisteyo-ops.github.io/Crystal-Agent/inject_full_screen.js',
-        botpressConfigUrl: 'https://pisteyo-ops.github.io/Crystal-Agent/Orenda.js',
+        botpressWebchatUrl: 'https://crystal-agent.pages.dev/inject_full_screen.js',
+        botpressConfigUrl: 'https://crystal-agent.pages.dev/Orenda.js',
         botLogoUrl: 'animaged-crystal.png',
         botName: 'Crystal',
         popupMessage: 'Have a Question? I can help!',
