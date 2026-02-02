@@ -24,7 +24,7 @@ window.botpress.init({
     "soundEnabled": true,
     "embeddedChatId": "testing"
   },
-  "clientId": "d08d44d1-1b76-4275-9069-8a8cb366b734"
+  "clientId": "6e9fa6a4-3cc4-45b4-a1dd-88b0360ee898"
 });
 
 window.botpress.on('webchat:initialized', () => {
