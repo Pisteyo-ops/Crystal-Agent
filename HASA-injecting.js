@@ -15,9 +15,13 @@
     // Track script loading state
     let scriptsLoaded = false;
     let scriptsLoading = false;
+    let webhookSent = false;
 
-    // Send traffic tracking webhook
+    // Send traffic tracking webhook (only once)
     function sendTrafficWebhook() {
+        if (webhookSent) return;
+        webhookSent = true;
+        
         try {
             fetch(config.webhookUrl, {
                 method: 'POST',
@@ -452,9 +456,6 @@
 
     // Initialize widget functionality
     function initializeWidget() {
-        // Send traffic tracking webhook
-        sendTrafficWebhook();
-
         const widgetButton = document.getElementById('crystalWidgetButton');
         const chatContainer = document.getElementById('crystalChatContainer');
         const chatContent = document.getElementById('crystalChatContent');
@@ -498,6 +499,9 @@
             popupNotification.classList.remove('show');
             popupNotification.classList.add('hide');
             
+            // Send traffic webhook on first interaction
+            sendTrafficWebhook();
+            
             // Load scripts before opening chat
             loadBotpressScripts().then(() => {
                 chatContainer.classList.add('active');
@@ -536,6 +540,9 @@
             } else {
                 popupNotification.classList.remove('show');
                 popupNotification.classList.add('hide');
+                
+                // Send traffic webhook on first interaction
+                sendTrafficWebhook();
                 
                 // Load scripts before opening chat
                 loadBotpressScripts().then(() => {
