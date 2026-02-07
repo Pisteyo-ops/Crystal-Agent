@@ -8,8 +8,29 @@
         botLogoUrl: 'animaged-crystal.png',
         botName: 'Crystal',
         popupMessage: 'Have a Question? I can help!',
-        popupDelay: 10000
+        popupDelay: 10000,
+        webhookUrl: 'https://n8n.pisteyo.ai/webhook/8027c19a-3804-4879-bac2-82b23e254666'
     };
+
+    // Send traffic tracking webhook
+    function sendTrafficWebhook() {
+        try {
+            fetch(config.webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href,
+                    referrer: document.referrer || 'direct',
+                    userAgent: navigator.userAgent
+                })
+            }).catch(err => console.debug('Webhook error:', err));
+        } catch (error) {
+            console.debug('Webhook error:', error);
+        }
+    }
 
     // Inject CSS
     function injectStyles() {
@@ -399,6 +420,9 @@
 
     // Initialize widget functionality
     function initializeWidget() {
+        // Send traffic tracking webhook
+        sendTrafficWebhook();
+
         const widgetButton = document.getElementById('crystalWidgetButton');
         const chatContainer = document.getElementById('crystalChatContainer');
         const chatContent = document.getElementById('crystalChatContent');
@@ -547,5 +571,4 @@
         window.CrystalBot.init();
     }
 })();
-
 
