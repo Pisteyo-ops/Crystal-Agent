@@ -12,6 +12,10 @@
         webhookUrl: 'https://n8n.pisteyo.ai/webhook/8027c19a-3804-4879-bac2-82b23e254666'
     };
 
+    // Track script loading state
+    let scriptsLoaded = false;
+    let scriptsLoading = false;
+
     // Send traffic tracking webhook
     function sendTrafficWebhook() {
         try {
@@ -388,9 +392,27 @@
         document.body.appendChild(container);
     }
 
-    // Load Botpress scripts
+    // Load Botpress scripts (lazy loaded on first interaction)
     function loadBotpressScripts() {
         return new Promise((resolve, reject) => {
+            // Prevent multiple simultaneous loads
+            if (scriptsLoaded) {
+                resolve();
+                return;
+            }
+            if (scriptsLoading) {
+                // Wait for existing load to complete
+                const checkInterval = setInterval(() => {
+                    if (scriptsLoaded) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+                return;
+            }
+
+            scriptsLoading = true;
+
             const webchatScript = document.createElement('script');
             webchatScript.src = config.botpressWebchatUrl;
             webchatScript.async = false;
@@ -398,11 +420,21 @@
                 const configScript = document.createElement('script');
                 configScript.src = config.botpressConfigUrl;
                 configScript.async = false;
-                configScript.onload = resolve;
-                configScript.onerror = reject;
+                configScript.onload = () => {
+                    scriptsLoaded = true;
+                    scriptsLoading = false;
+                    resolve();
+                };
+                configScript.onerror = () => {
+                    scriptsLoading = false;
+                    reject(new Error('Failed to load Botpress config'));
+                };
                 document.head.appendChild(configScript);
             };
-            webchatScript.onerror = reject;
+            webchatScript.onerror = () => {
+                scriptsLoading = false;
+                reject(new Error('Failed to load Botpress webchat'));
+            };
             document.head.appendChild(webchatScript);
         });
     }
@@ -465,19 +497,26 @@
         popupNotification.addEventListener('click', () => {
             popupNotification.classList.remove('show');
             popupNotification.classList.add('hide');
-            chatContainer.classList.add('active');
-            widgetButton.classList.add('active');
+            
+            // Load scripts before opening chat
+            loadBotpressScripts().then(() => {
+                chatContainer.classList.add('active');
+                widgetButton.classList.add('active');
 
-            if (window.innerWidth <= 768) {
-                document.body.classList.add('crystal-chat-active');
-                widgetButton.style.display = 'none';
-                handleViewportResize();
-                
-                // Show close button after 0.5 seconds
-                setTimeout(() => {
-                    mobileCloseBtn.classList.add('show');
-                }, 500);
-            }
+                if (window.innerWidth <= 768) {
+                    document.body.classList.add('crystal-chat-active');
+                    widgetButton.style.display = 'none';
+                    handleViewportResize();
+                    
+                    // Show close button after 0.5 seconds
+                    setTimeout(() => {
+                        mobileCloseBtn.classList.add('show');
+                    }, 500);
+                }
+            }).catch(err => {
+                console.error('Failed to load chatbot:', err);
+                alert('Unable to load chatbot. Please try again later.');
+            });
         });
 
         // Toggle chat
@@ -497,19 +536,26 @@
             } else {
                 popupNotification.classList.remove('show');
                 popupNotification.classList.add('hide');
-                chatContainer.classList.add('active');
-                widgetButton.classList.add('active');
+                
+                // Load scripts before opening chat
+                loadBotpressScripts().then(() => {
+                    chatContainer.classList.add('active');
+                    widgetButton.classList.add('active');
 
-                if (window.innerWidth <= 768) {
-                    document.body.classList.add('crystal-chat-active');
-                    widgetButton.style.display = 'none';
-                    handleViewportResize();
-                    
-                    // Show close button after 4 seconds
-                    setTimeout(() => {
-                        mobileCloseBtn.classList.add('show');
-                    }, 4000);
-                }
+                    if (window.innerWidth <= 768) {
+                        document.body.classList.add('crystal-chat-active');
+                        widgetButton.style.display = 'none';
+                        handleViewportResize();
+                        
+                        // Show close button after 4 seconds
+                        setTimeout(() => {
+                            mobileCloseBtn.classList.add('show');
+                        }, 4000);
+                    }
+                }).catch(err => {
+                    console.error('Failed to load chatbot:', err);
+                    alert('Unable to load chatbot. Please try again later.');
+                });
             }
         });
 
@@ -556,7 +602,7 @@
 
             injectStyles();
             injectHTML();
-            loadBotpressScripts();
+            // Botpress scripts are now lazy-loaded on first interaction
 
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initializeWidget);
