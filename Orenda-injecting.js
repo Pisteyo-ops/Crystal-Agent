@@ -8,8 +8,37 @@
         botLogoUrl: 'animaged-crystal.png',
         botName: 'Crystal',
         popupMessage: 'Have a Question? I can help!',
-        popupDelay: 10000
+        popupDelay: 10000,
+        webhookUrl: 'https://n8n.pisteyo.ai/webhook/8027c19a-3804-4879-bac2-82b23e254666'
     };
+
+    // Track script loading state
+    let scriptsLoaded = false;
+    let scriptsLoading = false;
+    let webhookSent = false;
+
+    // Send traffic tracking webhook (only once)
+    function sendTrafficWebhook() {
+        if (webhookSent) return;
+        webhookSent = true;
+        
+        try {
+            fetch(config.webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href,
+                    referrer: document.referrer || 'direct',
+                    userAgent: navigator.userAgent
+                })
+            }).catch(err => console.debug('Webhook error:', err));
+        } catch (error) {
+            console.debug('Webhook error:', error);
+        }
+    }
 
     // Inject CSS
     function injectStyles() {
@@ -367,9 +396,27 @@
         document.body.appendChild(container);
     }
 
-    // Load Botpress scripts
+    // Load Botpress scripts (lazy loaded on first interaction)
     function loadBotpressScripts() {
         return new Promise((resolve, reject) => {
+            // Prevent multiple simultaneous loads
+            if (scriptsLoaded) {
+                resolve();
+                return;
+            }
+            if (scriptsLoading) {
+                // Wait for existing load to complete
+                const checkInterval = setInterval(() => {
+                    if (scriptsLoaded) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+                return;
+            }
+
+            scriptsLoading = true;
+
             const webchatScript = document.createElement('script');
             webchatScript.src = config.botpressWebchatUrl;
             webchatScript.async = false;
@@ -377,11 +424,21 @@
                 const configScript = document.createElement('script');
                 configScript.src = config.botpressConfigUrl;
                 configScript.async = false;
-                configScript.onload = resolve;
-                configScript.onerror = reject;
+                configScript.onload = () => {
+                    scriptsLoaded = true;
+                    scriptsLoading = false;
+                    resolve();
+                };
+                configScript.onerror = () => {
+                    scriptsLoading = false;
+                    reject(new Error('Failed to load Botpress config'));
+                };
                 document.head.appendChild(configScript);
             };
-            webchatScript.onerror = reject;
+            webchatScript.onerror = () => {
+                scriptsLoading = false;
+                reject(new Error('Failed to load Botpress webchat'));
+            };
             document.head.appendChild(webchatScript);
         });
     }
@@ -441,19 +498,29 @@
         popupNotification.addEventListener('click', () => {
             popupNotification.classList.remove('show');
             popupNotification.classList.add('hide');
-            chatContainer.classList.add('active');
-            widgetButton.classList.add('active');
+            
+            // Send traffic webhook on first interaction
+            sendTrafficWebhook();
+            
+            // Load scripts before opening chat
+            loadBotpressScripts().then(() => {
+                chatContainer.classList.add('active');
+                widgetButton.classList.add('active');
 
-            if (window.innerWidth <= 768) {
-                document.body.classList.add('crystal-chat-active');
-                widgetButton.style.display = 'none';
-                handleViewportResize();
-                
-                // Show close button after 0.5 seconds
-                setTimeout(() => {
-                    mobileCloseBtn.classList.add('show');
-                }, 500);
-            }
+                if (window.innerWidth <= 768) {
+                    document.body.classList.add('crystal-chat-active');
+                    widgetButton.style.display = 'none';
+                    handleViewportResize();
+                    
+                    // Show close button after 0.5 seconds
+                    setTimeout(() => {
+                        mobileCloseBtn.classList.add('show');
+                    }, 500);
+                }
+            }).catch(err => {
+                console.error('Failed to load chatbot:', err);
+                alert('Unable to load chatbot. Please try again later.');
+            });
         });
 
         // Toggle chat
@@ -473,19 +540,29 @@
             } else {
                 popupNotification.classList.remove('show');
                 popupNotification.classList.add('hide');
-                chatContainer.classList.add('active');
-                widgetButton.classList.add('active');
+                
+                // Send traffic webhook on first interaction
+                sendTrafficWebhook();
+                
+                // Load scripts before opening chat
+                loadBotpressScripts().then(() => {
+                    chatContainer.classList.add('active');
+                    widgetButton.classList.add('active');
 
-                if (window.innerWidth <= 768) {
-                    document.body.classList.add('crystal-chat-active');
-                    widgetButton.style.display = 'none';
-                    handleViewportResize();
-                    
-                    // Show close button after 4 seconds
-                    setTimeout(() => {
-                        mobileCloseBtn.classList.add('show');
-                    }, 4000);
-                }
+                    if (window.innerWidth <= 768) {
+                        document.body.classList.add('crystal-chat-active');
+                        widgetButton.style.display = 'none';
+                        handleViewportResize();
+                        
+                        // Show close button after 4 seconds
+                        setTimeout(() => {
+                            mobileCloseBtn.classList.add('show');
+                        }, 4000);
+                    }
+                }).catch(err => {
+                    console.error('Failed to load chatbot:', err);
+                    alert('Unable to load chatbot. Please try again later.');
+                });
             }
         });
 
@@ -532,7 +609,7 @@
 
             injectStyles();
             injectHTML();
-            loadBotpressScripts();
+            // Botpress scripts are now lazy-loaded on first interaction
 
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initializeWidget);
@@ -547,3 +624,4 @@
         window.CrystalBot.init();
     }
 })();
+
