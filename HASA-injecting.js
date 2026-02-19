@@ -352,6 +352,28 @@
                     touch-action: manipulation;
                 }
             }
+
+            /* ---- Botpress typing indicator override ---- */
+.bpTypingIndicatorLoader {
+    display: none !important;
+}
+
+.bpTypingIndicatorContainer::before {
+    content: "typing…";
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 16px;
+    background: #f1f1f1;
+    color: #666;
+    font-size: 14px;
+    animation: blink 1.4s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: .3; }
+    50% { opacity: 1; }
+    100% { opacity: .3; }
+}
         `;
 
         const styleSheet = document.createElement('style');
@@ -624,5 +646,3 @@
         window.CrystalBot.init();
     }
 })();
-
-
