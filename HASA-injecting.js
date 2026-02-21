@@ -5,7 +5,7 @@
     const config = {
         botpressWebchatUrl: 'https://crystal-agent.pages.dev/inject_full_screen.js',
         botpressConfigUrl: 'https://crystal-agent.pages.dev/HASA.js',
-        botLogoUrl: 'animaged-crystal.png',
+        botLogoUrl: 'https://crystal-agent.pages.dev/animaged-crystal.png',
         botName: 'Crystal',
         popupMessage: 'Have a Question? I can help!',
         popupDelay: 10000,
@@ -353,27 +353,32 @@
                 }
             }
 
-            /* ---- Botpress typing indicator override ---- */
-.bpTypingIndicatorLoader {
-    display: none !important;
-}
-
-.bpTypingIndicatorContainer::before {
-    content: "typing…";
-    display: inline-block;
-    padding: 8px 12px;
-    border-radius: 16px;
-    background: #f1f1f1;
-    color: #666;
-    font-size: 14px;
-    animation: blink 1.4s infinite;
-}
-
-@keyframes blink {
-    0% { opacity: .3; }
-    50% { opacity: 1; }
-    100% { opacity: .3; }
-}
+            /* Override typing indicator animation with text */
+            .bpTypingIndicatorContainer {
+                gap: 0 !important;
+                padding: 8px 12px !important;
+                font-size: 14px;
+                color: var(--bpGray-600, #696d83);
+                font-style: italic;
+            }
+            .bpTypingIndicatorContainer::before,
+            .bpTypingIndicatorContainer::after {
+                display: none !important;
+                content: none !important;
+                animation: none !important;
+            }
+            .bpTypingIndicatorContainer .bpTypingIndicatorLoader {
+                display: none !important;
+            }
+            .bpTypingIndicatorContainer::after {
+                display: inline !important;
+                content: "I am gathering the best answer now…" !important;
+                width: auto !important;
+                height: auto !important;
+                background-color: transparent !important;
+                border-radius: 0 !important;
+                animation: none !important;
+            }
         `;
 
         const styleSheet = document.createElement('style');
@@ -463,6 +468,133 @@
             };
             document.head.appendChild(webchatScript);
         });
+    }
+
+    // Override typing indicator animation with text
+    function setupTypingIndicatorOverride() {
+        console.log('[CrystalBot] Setting up typing indicator override...');
+        
+        // Inject CSS to hide the pseudo-elements (can't be done via JS)
+        const hideDotsCSS = document.createElement('style');
+        hideDotsCSS.textContent = `
+            .bpTypingIndicatorContainer::before,
+            .bpTypingIndicatorContainer::after {
+                display: none !important;
+                content: none !important;
+            }
+            .bpTypingIndicatorContainer .bpTypingIndicatorLoader {
+                display: none !important;
+            }
+        `;
+        document.head.appendChild(hideDotsCSS);
+        
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) {
+                        console.log('[CrystalBot] Node added:', node.tagName, node.className);
+                        
+                        // Check if this is a typing indicator or contains one
+                        const indicators = node.classList?.contains('bpTypingIndicatorContainer') 
+                            ? [node] 
+                            : node.querySelectorAll?.('.bpTypingIndicatorContainer') || [];
+                        
+                        if (indicators.length > 0) {
+                            console.log('[CrystalBot] Found typing indicators:', indicators.length);
+                        }
+                        
+                        indicators.forEach((indicator) => {
+                            console.log('[CrystalBot] Modifying typing indicator:', indicator);
+                            // Clear the animated dots and replace with text
+                            indicator.innerHTML = '';
+                            indicator.textContent = 'I am gathering the best answer now…';
+                            indicator.style.cssText = `
+                                font-size: 14px !important;
+                                color: #696d83 !important;
+                                font-style: italic !important;
+                                padding: 8px 12px !important;
+                                gap: 0 !important;
+                            `;
+                        });
+                    }
+                });
+            });
+        });
+
+        // Start observing the document body for typing indicators
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        console.log('[CrystalBot] MutationObserver started');
+        
+        // Fallback: Periodic check for typing indicators (in case they're in iframes or shadow DOM)
+        setInterval(() => {
+            // Check main document
+            const indicators = document.querySelectorAll('.bpTypingIndicatorContainer');
+            indicators.forEach((indicator) => {
+                if (!indicator.dataset.modified) {
+                    console.log('[CrystalBot] Fallback found indicator:', indicator);
+                    indicator.innerHTML = '';
+                    indicator.textContent = 'I am gathering the best answer now…';
+                    indicator.style.cssText = `
+                        font-size: 14px !important;
+                        color: #696d83 !important;
+                        font-style: italic !important;
+                        padding: 8px 12px !important;
+                        gap: 0 !important;
+                    `;
+                    indicator.dataset.modified = 'true';
+                }
+            });
+            
+            // Check iframes
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach((iframe) => {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+                    if (iframeDoc) {
+                        // Inject CSS into iframe if not already done
+                        if (!iframeDoc.querySelector('#crystalbot-typing-css')) {
+                            const iframeCSS = iframeDoc.createElement('style');
+                            iframeCSS.id = 'crystalbot-typing-css';
+                            iframeCSS.textContent = `
+                                .bpTypingIndicatorContainer::before,
+                                .bpTypingIndicatorContainer::after {
+                                    display: none !important;
+                                    content: none !important;
+                                }
+                                .bpTypingIndicatorContainer .bpTypingIndicatorLoader {
+                                    display: none !important;
+                                }
+                            `;
+                            iframeDoc.head.appendChild(iframeCSS);
+                            console.log('[CrystalBot] Injected CSS into iframe');
+                        }
+                        
+                        const iframeIndicators = iframeDoc.querySelectorAll('.bpTypingIndicatorContainer');
+                        iframeIndicators.forEach((indicator) => {
+                            if (!indicator.dataset.modified) {
+                                console.log('[CrystalBot] Found indicator in iframe:', indicator);
+                                indicator.innerHTML = '';
+                                indicator.textContent = 'I am gathering the best answer now…';
+                                indicator.style.cssText = `
+                                    font-size: 14px !important;
+                                    color: #696d83 !important;
+                                    font-style: italic !important;
+                                    padding: 8px 12px !important;
+                                    gap: 0 !important;
+                                `;
+                                indicator.dataset.modified = 'true';
+                            }
+                        });
+                    }
+                } catch (e) {
+                    // Cross-origin iframe, can't access
+                }
+            });
+        }, 200);
     }
 
     // Handle mobile viewport changes (address bar showing/hiding)
@@ -631,6 +763,7 @@
 
             injectStyles();
             injectHTML();
+            setupTypingIndicatorOverride();
             // Botpress scripts are now lazy-loaded on first interaction
 
             if (document.readyState === 'loading') {

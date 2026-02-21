@@ -5,11 +5,39 @@
     const config = {
         botpressWebchatUrl: 'https://crystal-agent.pages.dev/inject_full_screen.js',
         botpressConfigUrl: 'https://crystal-agent.pages.dev/HASA_Demo.js',
-        botLogoUrl: 'animaged-crystal.png',
+        botLogoUrl: 'https://crystal-agent.pages.dev/animaged-crystal.png',
         botName: 'Crystal',
         popupMessage: 'Have a Question? I can help!',
         popupDelay: 10000
     };
+
+    // Track script loading state
+    let scriptsLoaded = false;
+    let scriptsLoading = false;
+    let webhookSent = false;
+
+    // Send traffic tracking webhook (only once)
+    function sendTrafficWebhook() {
+        if (webhookSent) return;
+        webhookSent = true;
+        
+        try {
+            fetch(config.webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href,
+                    referrer: document.referrer || 'direct',
+                    userAgent: navigator.userAgent
+                })
+            }).catch(err => console.debug('Webhook error:', err));
+        } catch (error) {
+            console.debug('Webhook error:', error);
+        }
+    }
 
     // Inject CSS
     function injectStyles() {
@@ -323,6 +351,33 @@
                     touch-action: manipulation;
                 }
             }
+
+            /* Override typing indicator animation with text */
+            .bpTypingIndicatorContainer {
+                gap: 0 !important;
+                padding: 8px 12px !important;
+                font-size: 14px;
+                color: var(--bpGray-600, #696d83);
+                font-style: italic;
+            }
+            .bpTypingIndicatorContainer::before,
+            .bpTypingIndicatorContainer::after {
+                display: none !important;
+                content: none !important;
+                animation: none !important;
+            }
+            .bpTypingIndicatorContainer .bpTypingIndicatorLoader {
+                display: none !important;
+            }
+            .bpTypingIndicatorContainer::after {
+                display: inline !important;
+                content: "I am gathering the best answer now…" !important;
+                width: auto !important;
+                height: auto !important;
+                background-color: transparent !important;
+                border-radius: 0 !important;
+                animation: none !important;
+            }
         `;
 
         const styleSheet = document.createElement('style');
@@ -367,9 +422,27 @@
         document.body.appendChild(container);
     }
 
-    // Load Botpress scripts
+    // Load Botpress scripts (lazy loaded on first interaction)
     function loadBotpressScripts() {
         return new Promise((resolve, reject) => {
+            // Prevent multiple simultaneous loads
+            if (scriptsLoaded) {
+                resolve();
+                return;
+            }
+            if (scriptsLoading) {
+                // Wait for existing load to complete
+                const checkInterval = setInterval(() => {
+                    if (scriptsLoaded) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+                return;
+            }
+
+            scriptsLoading = true;
+
             const webchatScript = document.createElement('script');
             webchatScript.src = config.botpressWebchatUrl;
             webchatScript.async = false;
@@ -377,13 +450,150 @@
                 const configScript = document.createElement('script');
                 configScript.src = config.botpressConfigUrl;
                 configScript.async = false;
-                configScript.onload = resolve;
-                configScript.onerror = reject;
+                configScript.onload = () => {
+                    scriptsLoaded = true;
+                    scriptsLoading = false;
+                    resolve();
+                };
+                configScript.onerror = () => {
+                    scriptsLoading = false;
+                    reject(new Error('Failed to load Botpress config'));
+                };
                 document.head.appendChild(configScript);
             };
-            webchatScript.onerror = reject;
+            webchatScript.onerror = () => {
+                scriptsLoading = false;
+                reject(new Error('Failed to load Botpress webchat'));
+            };
             document.head.appendChild(webchatScript);
         });
+    }
+
+    // Override typing indicator animation with text
+    function setupTypingIndicatorOverride() {
+        console.log('[CrystalBot] Setting up typing indicator override...');
+        
+        // Inject CSS to hide the pseudo-elements (can't be done via JS)
+        const hideDotsCSS = document.createElement('style');
+        hideDotsCSS.textContent = `
+            .bpTypingIndicatorContainer::before,
+            .bpTypingIndicatorContainer::after {
+                display: none !important;
+                content: none !important;
+            }
+            .bpTypingIndicatorContainer .bpTypingIndicatorLoader {
+                display: none !important;
+            }
+        `;
+        document.head.appendChild(hideDotsCSS);
+        
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) {
+                        console.log('[CrystalBot] Node added:', node.tagName, node.className);
+                        
+                        // Check if this is a typing indicator or contains one
+                        const indicators = node.classList?.contains('bpTypingIndicatorContainer') 
+                            ? [node] 
+                            : node.querySelectorAll?.('.bpTypingIndicatorContainer') || [];
+                        
+                        if (indicators.length > 0) {
+                            console.log('[CrystalBot] Found typing indicators:', indicators.length);
+                        }
+                        
+                        indicators.forEach((indicator) => {
+                            console.log('[CrystalBot] Modifying typing indicator:', indicator);
+                            // Clear the animated dots and replace with text
+                            indicator.innerHTML = '';
+                            indicator.textContent = 'I am gathering the best answer now…';
+                            indicator.style.cssText = `
+                                font-size: 14px !important;
+                                color: #696d83 !important;
+                                font-style: italic !important;
+                                padding: 8px 12px !important;
+                                gap: 0 !important;
+                            `;
+                        });
+                    }
+                });
+            });
+        });
+
+        // Start observing the document body for typing indicators
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        console.log('[CrystalBot] MutationObserver started');
+        
+        // Fallback: Periodic check for typing indicators (in case they're in iframes or shadow DOM)
+        setInterval(() => {
+            // Check main document
+            const indicators = document.querySelectorAll('.bpTypingIndicatorContainer');
+            indicators.forEach((indicator) => {
+                if (!indicator.dataset.modified) {
+                    console.log('[CrystalBot] Fallback found indicator:', indicator);
+                    indicator.innerHTML = '';
+                    indicator.textContent = 'I am gathering the best answer now…';
+                    indicator.style.cssText = `
+                        font-size: 14px !important;
+                        color: #696d83 !important;
+                        font-style: italic !important;
+                        padding: 8px 12px !important;
+                        gap: 0 !important;
+                    `;
+                    indicator.dataset.modified = 'true';
+                }
+            });
+            
+            // Check iframes
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach((iframe) => {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+                    if (iframeDoc) {
+                        // Inject CSS into iframe if not already done
+                        if (!iframeDoc.querySelector('#crystalbot-typing-css')) {
+                            const iframeCSS = iframeDoc.createElement('style');
+                            iframeCSS.id = 'crystalbot-typing-css';
+                            iframeCSS.textContent = `
+                                .bpTypingIndicatorContainer::before,
+                                .bpTypingIndicatorContainer::after {
+                                    display: none !important;
+                                    content: none !important;
+                                }
+                                .bpTypingIndicatorContainer .bpTypingIndicatorLoader {
+                                    display: none !important;
+                                }
+                            `;
+                            iframeDoc.head.appendChild(iframeCSS);
+                            console.log('[CrystalBot] Injected CSS into iframe');
+                        }
+                        
+                        const iframeIndicators = iframeDoc.querySelectorAll('.bpTypingIndicatorContainer');
+                        iframeIndicators.forEach((indicator) => {
+                            if (!indicator.dataset.modified) {
+                                console.log('[CrystalBot] Found indicator in iframe:', indicator);
+                                indicator.innerHTML = '';
+                                indicator.textContent = 'I am gathering the best answer now…';
+                                indicator.style.cssText = `
+                                    font-size: 14px !important;
+                                    color: #696d83 !important;
+                                    font-style: italic !important;
+                                    padding: 8px 12px !important;
+                                    gap: 0 !important;
+                                `;
+                                indicator.dataset.modified = 'true';
+                            }
+                        });
+                    }
+                } catch (e) {
+                    // Cross-origin iframe, can't access
+                }
+            });
+        }, 200);
     }
 
     // Handle mobile viewport changes (address bar showing/hiding)
@@ -441,19 +651,29 @@
         popupNotification.addEventListener('click', () => {
             popupNotification.classList.remove('show');
             popupNotification.classList.add('hide');
-            chatContainer.classList.add('active');
-            widgetButton.classList.add('active');
+            
+            // Send traffic webhook on first interaction
+            sendTrafficWebhook();
+            
+            // Load scripts before opening chat
+            loadBotpressScripts().then(() => {
+                chatContainer.classList.add('active');
+                widgetButton.classList.add('active');
 
-            if (window.innerWidth <= 768) {
-                document.body.classList.add('crystal-chat-active');
-                widgetButton.style.display = 'none';
-                handleViewportResize();
-                
-                // Show close button after 0.5 seconds
-                setTimeout(() => {
-                    mobileCloseBtn.classList.add('show');
-                }, 500);
-            }
+                if (window.innerWidth <= 768) {
+                    document.body.classList.add('crystal-chat-active');
+                    widgetButton.style.display = 'none';
+                    handleViewportResize();
+                    
+                    // Show close button after 0.5 seconds
+                    setTimeout(() => {
+                        mobileCloseBtn.classList.add('show');
+                    }, 500);
+                }
+            }).catch(err => {
+                console.error('Failed to load chatbot:', err);
+                alert('Unable to load chatbot. Please try again later.');
+            });
         });
 
         // Toggle chat
@@ -473,19 +693,29 @@
             } else {
                 popupNotification.classList.remove('show');
                 popupNotification.classList.add('hide');
-                chatContainer.classList.add('active');
-                widgetButton.classList.add('active');
+                
+                // Send traffic webhook on first interaction
+                sendTrafficWebhook();
+                
+                // Load scripts before opening chat
+                loadBotpressScripts().then(() => {
+                    chatContainer.classList.add('active');
+                    widgetButton.classList.add('active');
 
-                if (window.innerWidth <= 768) {
-                    document.body.classList.add('crystal-chat-active');
-                    widgetButton.style.display = 'none';
-                    handleViewportResize();
-                    
-                    // Show close button after 4 seconds
-                    setTimeout(() => {
-                        mobileCloseBtn.classList.add('show');
-                    }, 4000);
-                }
+                    if (window.innerWidth <= 768) {
+                        document.body.classList.add('crystal-chat-active');
+                        widgetButton.style.display = 'none';
+                        handleViewportResize();
+                        
+                        // Show close button after 4 seconds
+                        setTimeout(() => {
+                            mobileCloseBtn.classList.add('show');
+                        }, 4000);
+                    }
+                }).catch(err => {
+                    console.error('Failed to load chatbot:', err);
+                    alert('Unable to load chatbot. Please try again later.');
+                });
             }
         });
 
@@ -532,7 +762,8 @@
 
             injectStyles();
             injectHTML();
-            loadBotpressScripts();
+            setupTypingIndicatorOverride();
+            // Botpress scripts are now lazy-loaded on first interaction
 
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initializeWidget);

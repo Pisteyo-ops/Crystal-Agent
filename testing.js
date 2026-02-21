@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // Configuration
     const config = {
         botpressWebchatUrl: 'https://crystal-agent.pages.dev/inject_full_screen.js',
         botpressConfigUrl: 'https://crystal-agent.pages.dev/HASA.js',
@@ -11,176 +10,177 @@
         popupDelay: 10000
     };
 
-    // Inject CSS
+    /* -------------------- STYLES -------------------- */
     function injectStyles() {
         const styles = `
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+        * { margin:0; padding:0; box-sizing:border-box; }
 
-            body {
-                font-family: Arial, sans-serif;
-                line-height: 1.6;
-                color: #333;
-            }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
 
-            .crystal-widget-button {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                width: 60px;
-                height: 60px;
-                background: transparent;
-                border-radius: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                box-shadow: none;
-                transition: transform 0.3s ease;
-                z-index: 2147483646;
-                border: none;
-            }
+        /* Floating widget */
+        .crystal-widget-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2147483646;
+            border: none;
+        }
 
-            .crystal-widget-button:hover {
-                transform: scale(1.1);
-                box-shadow: none;
-            }
+        .crystal-widget-button img {
+            width: 60px;
+            height: 60px;
+        }
 
-            .crystal-widget-button img {
-                width: 60px;
-                height: 60px;
-                transition: opacity 0.3s ease;
-                border-radius: 0;
-            }
+        .crystal-chat-gif { position:absolute; opacity:1; }
+        .crystal-close-icon { position:absolute; opacity:0; fill:#FF0000; }
 
-            .crystal-widget-button .crystal-chat-gif {
-                position: absolute;
-                opacity: 1;
-            }
+        .crystal-widget-button.active .crystal-chat-gif { opacity:0; }
+        .crystal-widget-button.active .crystal-close-icon { opacity:1; }
 
-            .crystal-widget-button .crystal-close-icon {
-                position: absolute;
-                opacity: 0;
-                fill: #FF0000;
-                width: 50px;
-                height: 50px;
-            }
+        /* Popup */
+        .crystal-popup-notification {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.15);
+            padding: 15px;
+            display: flex;
+            gap: 12px;
+            max-width: 320px;
+            z-index: 2147483645;
+            opacity: 0;
+            visibility: hidden;
+            transition: .3s;
+        }
 
-            .crystal-widget-button.active .crystal-chat-gif {
-                opacity: 0;
-            }
+        .crystal-popup-notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
 
-            .crystal-widget-button.active .crystal-close-icon {
-                opacity: 1;
-            }
+        .crystal-popup-logo { width:45px; height:45px; }
 
-            .crystal-popup-notification {
-                position: fixed;
-                bottom: 90px;
-                right: 20px;
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-                padding: 15px;
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-                max-width: 320px;
-                z-index: 2147483645;
-                opacity: 0;
-                visibility: hidden;
-                transform: translateY(10px);
-                transition: all 0.3s ease;
-            }
+        /* Chat container */
+        .crystal-chat-container {
+            position: fixed;
+            background: white;
+            box-shadow: 0 0 30px rgba(0,0,0,.2);
+            border-radius: 12px;
+            z-index: 2147483644;
+            opacity: 0;
+            visibility: hidden;
+            transition: .3s;
+        }
 
-            .crystal-popup-notification.show {
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0);
-            }
+        .crystal-chat-container.active {
+            opacity: 1;
+            visibility: visible;
+            display: flex;
+            flex-direction: column;
+        }
 
-            .crystal-popup-notification.hide {
-                opacity: 0;
-                visibility: hidden;
-                transform: translateY(10px);
-            }
-
-            .crystal-popup-logo {
-                width: 45px;
-                height: 45px;
-                flex-shrink: 0;
-                border-radius: 8px;
-            }
-
-            .crystal-popup-content {
-                flex: 1;
-            }
-
-            .crystal-popup-content h3 {
-                margin: 0 0 5px 0;
-                font-size: 16px;
-                font-weight: bold;
-                color: #2c3e50;
-            }
-
-            .crystal-popup-content p {
-                margin: 0;
-                font-size: 14px;
-                color: #555;
-                line-height: 1.4;
-            }
-
-            .crystal-popup-close {
-                cursor: pointer;
-                color: #999;
-                font-size: 20px;
-                line-height: 1;
-                padding: 0 5px;
-                flex-shrink: 0;
-            }
-
-            .crystal-popup-close:hover {
-                color: #333;
-            }
-
+        @media (min-width: 769px) {
             .crystal-chat-container {
-                position: fixed;
-                background: white;
-                box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-                border-radius: 12px;
-                overflow: hidden;
-                z-index: 2147483644;
-                transition: all 0.3s ease;
-                opacity: 0;
-                visibility: hidden;
-                transform: scale(0.9);
+                bottom: 100px;
+                right: 20px;
+                width: 25vw;
+                min-width: 350px;
+                max-width: 450px;
+                height: calc(100vh - 120px);
+                top: 20px;
+            }
+        }
+
+        /* Mobile fullscreen */
+        @media (max-width: 768px) {
+            .crystal-chat-container {
+                left: 0;
+                right: 0;
+                top: env(safe-area-inset-top,0);
+                bottom: 0;
+                width: 100vw;
+                height: 100dvh;
+                border-radius: 0;
+                overscroll-behavior: contain;
             }
 
-            .crystal-chat-container.active {
-                display: flex;
-                flex-direction: column;
-                opacity: 1;
-                visibility: visible;
-                transform: scale(1);
+            /* Hide floating close on mobile */
+            .crystal-widget-button.active {
+                display: none;
+            }
+        }
+
+        .crystal-chat-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body.crystal-chat-active {
+            overflow: hidden;
+        }
+
+        /* Mobile header close button */
+        @media (max-width: 768px) {
+            .bp-mobile-close {
+                position: absolute;
+                top: 48px;
+                right: 12px;
+                padding: 6px 14px;
+                font-size: 12px;
+                border-radius: 999px;
+                background: #f1f3f5;
+                border: 1px solid #ddd;
+                cursor: pointer;
+                z-index: 10;
+            }
+        }
+
+        /* Mobile: hide floating close icon */
+        @media (max-width: 768px) {
+            .crystal-widget-button.active {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .bp-mobile-close {
+                position: absolute;
+                top: 48px; /* just below sound & restart */
+                right: 12px;
+                padding: 6px 14px;
+                font-size: 12px;
+                font-weight: 500;
+                border-radius: 999px; /* cylindrical */
+                background: #f1f3f5;
+                color: #333;
+                border: 1px solid #ddd;
+                cursor: pointer;
+                z-index: 10;
+                transition: background 0.2s ease;
             }
 
-            /* Desktop styles - consistent spacing from top */
-            @media (min-width: 769px) {
-                .crystal-chat-container {
-                    bottom: 100px;
-                    right: 20px;
-                    width: 25vw;
-                    min-width: 350px;
-                    max-width: 450px;
-                    /* Dynamic height: from 100px from bottom to 20px from top */
-                    height: calc(100vh - 120px);
-                    top: 20px;
-                }
+            .bp-mobile-close:hover {
+                background: #e9ecef;
             }
+        }
 
+
+<<<<<<< HEAD
+=======
             /* Mobile styles - fullscreen with safe areas */
             @media (max-width: 768px) {
                 .crystal-widget-button {
@@ -323,32 +323,26 @@
                     touch-action: manipulation;
                 }
             }
+>>>>>>> a24ad937b7fc483230c94539c8fa02d392670550
         `;
-
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = styles;
-        document.head.appendChild(styleSheet);
+        const s = document.createElement('style');
+        s.textContent = styles;
+        document.head.appendChild(s);
     }
 
-    // Inject HTML
+    /* -------------------- HTML -------------------- */
     function injectHTML() {
-        const html = `
-            <!-- Widget Button -->
-            <div class="crystal-widget-button" id="crystalWidgetButton">
-                <img class="crystal-chat-gif" src="${config.botLogoUrl}" alt="Chat">
-                <svg class="crystal-close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-            </div>
+        document.body.insertAdjacentHTML('beforeend', `
+        <div class="crystal-widget-button" id="crystalWidgetButton">
+            <img class="crystal-chat-gif" src="${config.botLogoUrl}">
+            <svg class="crystal-close-icon" viewBox="0 0 24 24">
+                <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+        </div>
 
-            <!-- Popup Notification -->
-            <div class="crystal-popup-notification" id="crystalPopupNotification">
-                <img class="crystal-popup-logo" src="${config.botLogoUrl}" alt="${config.botName}">
-                <div class="crystal-popup-content">
-                    <h3>${config.botName}</h3>
-                    <p>${config.popupMessage}</p>
-                </div>
-                <span class="crystal-popup-close" id="crystalPopupClose">&times;</span>
+        <div class="crystal-chat-container" id="crystalChatContainer">
+            <div class="crystal-chat-content">
+                <div id="testing"></div>
             </div>
 
             <!-- Chat Container -->
@@ -367,35 +361,25 @@
         document.body.appendChild(container);
     }
 
-    // Load Botpress scripts
+    /* -------------------- BOTPRESS -------------------- */
     function loadBotpressScripts() {
         return new Promise((resolve, reject) => {
-            const webchatScript = document.createElement('script');
-            webchatScript.src = config.botpressWebchatUrl;
-            webchatScript.async = false;
-            webchatScript.onload = () => {
-                const configScript = document.createElement('script');
-                configScript.src = config.botpressConfigUrl;
-                configScript.async = false;
-                configScript.onload = resolve;
-                configScript.onerror = reject;
-                document.head.appendChild(configScript);
+            const s1 = document.createElement('script');
+            s1.src = config.botpressWebchatUrl;
+            s1.onload = () => {
+                const s2 = document.createElement('script');
+                s2.src = config.botpressConfigUrl;
+                s2.onload = resolve;
+                s2.onerror = reject;
+                document.head.appendChild(s2);
             };
-            webchatScript.onerror = reject;
-            document.head.appendChild(webchatScript);
+            document.head.appendChild(s1);
         });
     }
 
-    // Handle mobile viewport changes (address bar showing/hiding)
-    function handleViewportResize() {
-        if (window.innerWidth <= 768) {
-            const chatContainer = document.getElementById('crystalChatContainer');
-            if (chatContainer && chatContainer.classList.contains('active')) {
-                // Force recalculation of height when viewport changes
-                chatContainer.style.height = window.innerHeight + 'px';
-            }
-        }
-    }
+    /* -------------------- MOBILE HEADER CLOSE -------------------- */
+    function injectMobileHeaderClose() {
+        if (window.innerWidth > 768) return;
 
     // Initialize widget functionality
     function initializeWidget() {
@@ -406,9 +390,9 @@
         const popupClose = document.getElementById('crystalPopupClose');
         const mobileCloseBtn = document.getElementById('crystalMobileCloseBtn');
 
-        // Handle viewport resize for mobile
-        window.addEventListener('resize', handleViewportResize);
-        window.addEventListener('orientationchange', handleViewportResize);
+            const btn = document.createElement('button');
+            btn.className = 'bp-mobile-close';
+            btn.textContent = 'Close';
 
         // Mobile close button handler
         mobileCloseBtn.addEventListener('click', () => {
@@ -430,35 +414,32 @@
             }
         }, config.popupDelay);
 
-        // Close popup
-        popupClose.addEventListener('click', (e) => {
-            e.stopPropagation();
-            popupNotification.classList.remove('show');
-            popupNotification.classList.add('hide');
-        });
+            header.style.position = 'relative';
+            header.appendChild(btn);
+            clearInterval(interval);
+        }, 300);
+    }
 
-        // Click popup to open chat
-        popupNotification.addEventListener('click', () => {
-            popupNotification.classList.remove('show');
-            popupNotification.classList.add('hide');
-            chatContainer.classList.add('active');
-            widgetButton.classList.add('active');
+    /* -------------------- INIT -------------------- */
+    function initializeWidget() {
+        const btn = document.getElementById('crystalWidgetButton');
+        const chat = document.getElementById('crystalChatContainer');
 
-            if (window.innerWidth <= 768) {
+        btn.onclick = () => {
+            const open = chat.classList.toggle('active');
+            btn.classList.toggle('active', open);
+
+            if (open) {
                 document.body.classList.add('crystal-chat-active');
-                widgetButton.style.display = 'none';
-                handleViewportResize();
-                
-                // Show close button after 0.5 seconds
-                setTimeout(() => {
-                    mobileCloseBtn.classList.add('show');
-                }, 500);
+                injectMobileHeaderClose();
+            } else {
+                document.body.classList.remove('crystal-chat-active');
             }
-        });
+        };
+    }
 
-        // Toggle chat
-        widgetButton.addEventListener('click', () => {
-            const isActive = chatContainer.classList.contains('active');
+    function injectMobileHeaderClose() {
+    if (window.innerWidth > 768) return;
 
             if (isActive) {
                 chatContainer.classList.remove('active');
@@ -489,61 +470,39 @@
             }
         });
 
-        // Prevent body scroll when mouse/touch is over chat content
-        chatContent.addEventListener('wheel', (e) => {
-            e.stopPropagation();
-        }, { passive: true });
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'bp-mobile-close';
+        closeBtn.textContent = 'Close';
 
-        chatContent.addEventListener('touchmove', (e) => {
-            e.stopPropagation();
-        }, { passive: true });
+        closeBtn.addEventListener('click', () => {
+            const chatContainer = document.getElementById('crystalChatContainer');
+            const widgetButton = document.getElementById('crystalWidgetButton');
 
-        // Store scroll position and prevent scrolling
-        // let scrollPosition = 0;
+            chatContainer.classList.remove('active');
+            widgetButton.classList.remove('active');
+            document.body.classList.remove('crystal-chat-active');
+        });
 
-        // chatContent.addEventListener('mouseenter', () => {
-        //     scrollPosition = window.pageYOffset;
-        //     document.body.style.position = 'fixed';
-        //     document.body.style.top = `-${scrollPosition}px`;
-        //     document.body.style.width = '100%';
-        //     document.body.style.overflowY = 'scroll';
-        // });
+        header.style.position = 'relative';
+        header.appendChild(closeBtn);
 
-        // chatContent.addEventListener('mouseleave', () => {
-        //     if (window.innerWidth > 768) {
-        //         document.body.style.position = '';
-        //         document.body.style.top = '';
-        //         document.body.style.width = '';
-        //         document.body.style.overflowY = '';
-        //         window.scrollTo(0, scrollPosition);
-        //     }
-        // });
+        clearInterval(interval);
+    }, 300);
     }
 
-    // Public API
-    window.CrystalBot = {
-        init: function (options = {}) {
-            if (options.botLogoUrl) config.botLogoUrl = options.botLogoUrl;
-            if (options.botName) config.botName = options.botName;
-            if (options.popupMessage) config.popupMessage = options.popupMessage;
-            if (options.popupDelay !== undefined) config.popupDelay = options.popupDelay;
-            if (options.botpressWebchatUrl) config.botpressWebchatUrl = options.botpressWebchatUrl;
-            if (options.botpressConfigUrl) config.botpressConfigUrl = options.botpressConfigUrl;
 
+    window.CrystalBot = {
+        init() {
             injectStyles();
             injectHTML();
             loadBotpressScripts();
-
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializeWidget);
-            } else {
-                initializeWidget();
-            }
+            document.readyState === 'loading'
+                ? document.addEventListener('DOMContentLoaded', initializeWidget)
+                : initializeWidget();
         }
     };
 
-    // Auto-initialize if data attribute is present
-    if (document.currentScript && document.currentScript.hasAttribute('data-auto-init')) {
+    if (document.currentScript?.hasAttribute('data-auto-init')) {
         window.CrystalBot.init();
     }
 })();
