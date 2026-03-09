@@ -2,8 +2,8 @@
     'use strict';
 
     const config = {
-        botpressWebchatUrl: 'https://crystal-agent.pages.dev/inject_full_screen.js',
-        botpressConfigUrl: 'https://crystal-agent.pages.dev/HASA.js',
+        botpressWebchatUrl: 'https://pisteyo-ops.github.io/Crystal-Agent/inject_full_screen.js',
+        botpressConfigUrl: 'https://pisteyo-ops.github.io/Crystal-Agent/HASA.js',
         botLogoUrl: 'animaged-crystal.png',
         botName: 'Crystal',
         popupMessage: 'Have a Question? I can help!',
